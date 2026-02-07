@@ -1,0 +1,112 @@
+<!-- templates/index.html (or serve static) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ModernShop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="/static/styles.css"/>
+</head>
+<body>
+  <header class="header">
+    <div class="brand">🛒 ModernShop</div>
+    <div class="search-bar">
+      <input id="q" placeholder="Search products..."/>
+      <input id="brand" placeholder="Brand"/>
+      <input id="category" placeholder="Category"/>
+      <input id="min_price" type="number" step="0.01" placeholder="Min Price"/>
+      <input id="max_price" type="number" step="0.01" placeholder="Max Price"/>
+      <button id="searchBtn">Search</button>
+    </div>
+    <div class="auth">
+      <input id="email" placeholder="Email"/>
+      <input id="password" type="password" placeholder="Password"/>
+      <button id="loginBtn">Login</button>
+      <button id="registerBtn">Register</button>
+    </div>
+  </header>
+  <main class="container">
+    <section>
+      <h2>Recommendations</h2>
+      <div id="recs" class="grid"></div>
+    </section>
+    <section>
+      <h2>Popular</h2>
+      <div id="popular" class="grid"></div>
+    </section>
+    <section>
+      <h2>Search Results</h2>
+      <div id="results" class="grid"></div>
+    </section>
+  </main>
+  <script type="module">
+    const state = { user: null, base: '' };
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email,password}) });
+      const data = await res.json();
+      if (res.ok) { state.user = data; loadRecs(); } else { alert(data.error || 'Login failed'); }
+    }
+    async function register() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const username = email.split('@');
+      const res = await fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email,password,username}) });
+      const data = await res.json();
+      if (res.ok) { alert('Registered. Please login.'); } else { alert('Registration failed'); }
+    }
+    async function search() {
+      const params = new URLSearchParams();
+      ['q','brand','category','min_price','max_price'].forEach(id => {
+        const v = document.getElementById(id).value.trim();
+        if (v) params.set(id, v);
+      });
+      const res = await fetch('/api/products?' + params.toString());
+      const data = await res.json();
+      render('results', data);
+    }
+    async function loadPopular() {
+      const res = await fetch('/api/products/popular');
+      render('popular', await res.json());
+    }
+    async function loadRecs() {
+      if (!state.user) { document.getElementById('recs').innerHTML = '<p>Login to see personalized recommendations.</p>'; return; }
+      const res = await fetch('/api/recommendations?user_id=' + state.user.id);
+      render('recs', await res.json());
+    }
+    function render(targetId, items) {
+      const el = document.getElementById(targetId);
+      el.innerHTML = (items || []).map(prod => `
+        <div class="card">
+          <img src="${prod.image_url || 'https://via.placeholder.com/300x180'}" alt="">
+          <div class="card-body">
+            <h3>${prod.name}</h3>
+            <p>${prod.brand || ''} • ${prod.category || ''}</p>
+            <div class="price">$${Number(prod.price).toFixed(2)}</div>
+            <button data-id="${prod.id}" class="buy">Add to Cart</button>
+            <button data-id="${prod.id}" class="view">View</button>
+          </div>
+        </div>
+      `).join('');
+      el.querySelectorAll('.buy').forEach(btn => btn.addEventListener('click', async e => {
+        if (!state.user) return alert('Login first');
+        const pid = Number(e.currentTarget.dataset.id);
+        await fetch('/api/purchases', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({user_id: state.user.id, product_id: pid, quantity: 1, price_at_purchase: 0})});
+        alert('Added to cart');
+      }));
+      el.querySelectorAll('.view').forEach(btn => btn.addEventListener('click', async e => {
+        if (!state.user) return;
+        const pid = Number(e.currentTarget.dataset.id);
+        await fetch('/api/browse', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({user_id: state.user.id, product_id: pid, action:'view'})});
+        loadRecs();
+      }));
+    }
+    document.getElementById('searchBtn').addEventListener('click', search);
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('registerBtn').addEventListener('click', register);
+    loadPopular();
+  </script>
+</body>
+</html>
