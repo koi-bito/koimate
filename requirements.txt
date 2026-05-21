@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-JWT-Extended
+Flask-Cors
+PyMySQL
+scikit-learn
+numpy
+pandas
+python-dotenv
+cryptography

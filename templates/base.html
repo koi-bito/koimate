@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOIMATE Recommendations</title>
+    <meta name="description" content="Discover products tailored exactly to your needs using advanced AI.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <header>
+        <a href="/" class="logo">KOI<span>MATE</span></a>
+        <nav>
+            <a href="/"><i class="ph ph-compass"></i> Discover</a>
+            <a href="/dashboard"><i class="ph ph-chart-line-up"></i> Analytics</a>
+            <a href="/login" id="nav-login"><i class="ph ph-sign-in"></i> Login</a>
+            <a href="#" id="nav-logout" style="display:none;" onclick="logout()"><i class="ph ph-sign-out"></i> Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

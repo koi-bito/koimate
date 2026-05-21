@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <h1>Find Exactly What You Need</h1>
+    <p>Tell our AI what you recently bought, what you are looking for, and what you're short on. We'll recommend the perfect products tailored specifically to your lifestyle.</p>
+</section>
+
+<div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+    <form id="recommendation-form">
+        <div class="input-group">
+            <label for="purchases"><i class="ph ph-shopping-bag"></i> Recent Purchases</label>
+            <textarea id="purchases" placeholder="e.g., I recently bought a high-end gaming laptop and a mechanical keyboard..."></textarea>
+        </div>
+        <div class="input-group">
+            <label for="needs"><i class="ph ph-magnifying-glass"></i> Current Needs</label>
+            <textarea id="needs" placeholder="e.g., I'm looking for a comfortable ergonomic chair for long coding sessions..."></textarea>
+        </div>
+        <div class="input-group">
+            <label for="shortages"><i class="ph ph-warning-circle"></i> Shortages</label>
+            <textarea id="shortages" placeholder="e.g., I'm completely out of premium coffee beans..."></textarea>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+                <i class="ph ph-sparkle"></i> Get AI Recommendations
+            </button>
+            <div class="loader-container" id="loader-container">
+                <div class="loader"></div>
+                <p style="margin-top: 1rem; color: var(--primary-color);">Analyzing your profile...</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="results-section" style="display: none; animation: fadeIn 0.8s ease-out forwards;">
+    <h2 style="text-align: center; margin-top: 6rem; font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Curated For You</h2>
+    <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Based on our advanced AI analysis, here are the best matches for your needs.</p>
+    <div class="product-grid" id="product-grid">
+        <!-- Products will be injected here via JS -->
+    </div>
+</div>
+{% endblock %}
