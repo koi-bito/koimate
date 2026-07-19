@@ -1,6 +1,6 @@
 # 🛒 Koimate
 
-A Flask-based e-commerce recommendation engine that tracks real user behavior — views, cart additions, purchases — and uses **TF-IDF + KNN content-based filtering** to deliver personalized product suggestions that improve with every interaction.
+A Flask-based e-commerce recommendation engine that tracks real user behavior - views, cart additions, purchases - and uses **TF-IDF + KNN content-based filtering** to deliver personalized product suggestions that improve with every interaction.
 
 > Achieved ~22% reduction in irrelevant recommendations compared to a static/category-based baseline.
 
@@ -22,12 +22,12 @@ The result: recommendations that shift based on what you actually do, not just w
 
 ## Features
 
-- **TF-IDF + KNN Recommendations** — content-based filtering with behavioral re-ranking
-- **Behavior Tracking** — logs views, purchases, add-to-cart events per user
-- **JWT Authentication** — secure registration, login, protected routes
-- **Analytics Endpoint** — user interaction pattern insights
-- **Modular Architecture** — Flask Blueprints, clean service/route separation
-- **MySQL Backend** — Flask-SQLAlchemy + PyMySQL, tables auto-created on first run
+- **TF-IDF + KNN Recommendations** - content-based filtering with behavioral re-ranking
+- **Behavior Tracking** - logs views, purchases, add-to-cart events per user
+- **JWT Authentication** - secure registration, login, protected routes
+- **Analytics Endpoint** - user interaction pattern insights
+- **Modular Architecture** - Flask Blueprints, clean service/route separation
+- **MySQL Backend** - Flask-SQLAlchemy + PyMySQL, tables auto-created on first run
 
 ---
 
@@ -53,10 +53,10 @@ koimate/
 ├── mock_data.py        # Dev seed data
 ├── requirements.txt
 ├── routes/
-│   ├── auth.py         # /api/auth — register & login
-│   ├── recommender.py  # /api/recommend — personalized recommendations
-│   ├── analytics.py    # /api/analytics — usage analytics
-│   ├── tracking.py     # /api/track — behavior event logging
+│   ├── auth.py         # /api/auth - register & login
+│   ├── recommender.py  # /api/recommend - personalized recommendations
+│   ├── analytics.py    # /api/analytics - usage analytics
+│   ├── tracking.py     # /api/track - behavior event logging
 │   └── pages.py        # Frontend routes
 └── services/           # Recommendation engine and business logic
 ```
@@ -107,4 +107,4 @@ python app.py
 
 ## Context
 
-Koimate was built as a deep dive into recommendation systems before moving on to more complex AI projects. The TF-IDF + KNN approach is intentionally classical — the goal was to understand the math behind content filtering before abstracting it away with embedding models. The behavioral re-ranking layer was added after noticing that pure content similarity ignored actual user intent.
+Koimate was built as a deep dive into recommendation systems before moving on to more complex AI projects. The TF-IDF + KNN approach is intentionally classical - the goal was to understand the math behind content filtering before abstracting it away with embedding models. The behavioral re-ranking layer was added after noticing that pure content similarity ignored actual user intent.
