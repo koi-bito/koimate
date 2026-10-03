@@ -1,5 +1,7 @@
 # 🛒 Koimate
 
+[![CI](https://github.com/koi-bito/koimate/actions/workflows/ci.yml/badge.svg)](https://github.com/koi-bito/koimate/actions/workflows/ci.yml)
+
 A Flask-based e-commerce recommendation engine that tracks real user behavior - views, cart additions, purchases - and uses **TF-IDF + KNN content-based filtering** to deliver personalized product suggestions that improve with every interaction.
 
 > Achieved ~22% reduction in irrelevant recommendations compared to a static/category-based baseline.
