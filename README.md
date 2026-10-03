@@ -1,4 +1,4 @@
-# 🛒 Koimate
+# Koimate
 
 [![CI](https://github.com/koi-bito/koimate/actions/workflows/ci.yml/badge.svg)](https://github.com/koi-bito/koimate/actions/workflows/ci.yml)
 
