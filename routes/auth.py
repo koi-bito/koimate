@@ -33,12 +33,12 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({"msg": "Bad username or password"}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     return jsonify(access_token=access_token)
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def get_user_profile():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     user = User.query.get(current_user_id)
     return jsonify(id=user.id, username=user.username)

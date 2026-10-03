@@ -3,9 +3,52 @@
 {% block content %}
 <section class="hero" style="margin-bottom: 3rem;">
     <h1 style="font-size: 4rem;"><i class="ph ph-chart-pie-slice"></i> Analytics Dashboard</h1>
-    <p>Track user behavior, interactions, and system performance.</p>
+    <p>Product popularity insights, user ratings, and interaction trends — all in one view.</p>
 </section>
 
+<!-- KPI Summary Cards -->
+<div id="kpi-cards" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+    <div class="glass-card" style="padding: 1.5rem; text-align: center; border-radius: 16px;">
+        <i class="ph ph-eye" style="font-size: 2rem; color: var(--primary-color);"></i>
+        <div id="kpi-views" style="font-size: 2.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; margin: 0.5rem 0;">—</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Total Views</div>
+    </div>
+    <div class="glass-card" style="padding: 1.5rem; text-align: center; border-radius: 16px;">
+        <i class="ph ph-shopping-cart" style="font-size: 2rem; color: var(--secondary-color);"></i>
+        <div id="kpi-carts" style="font-size: 2.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; margin: 0.5rem 0;">—</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Cart Adds</div>
+    </div>
+    <div class="glass-card" style="padding: 1.5rem; text-align: center; border-radius: 16px;">
+        <i class="ph ph-receipt" style="font-size: 2rem; color: var(--accent-color);"></i>
+        <div id="kpi-purchases" style="font-size: 2.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; margin: 0.5rem 0;">—</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Purchases</div>
+    </div>
+    <div class="glass-card" style="padding: 1.5rem; text-align: center; border-radius: 16px;">
+        <i class="ph ph-star" style="font-size: 2rem; color: #f59e0b;"></i>
+        <div id="kpi-avg-rating" style="font-size: 2.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; margin: 0.5rem 0;">—</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Avg Rating</div>
+    </div>
+</div>
+
+<!-- Row 1: Top Products + Average Ratings -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
+    <div class="chart-container">
+        <h3 style="margin-bottom: 1.5rem; color: var(--primary-color); font-weight: 700;"><i class="ph ph-chart-bar"></i> Top 10 Products by Interactions</h3>
+        <canvas id="topProductsChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3 style="margin-bottom: 1.5rem; color: #f59e0b; font-weight: 700;"><i class="ph ph-star"></i> Top 10 Products by Rating</h3>
+        <canvas id="avgRatingsChart"></canvas>
+    </div>
+</div>
+
+<!-- Row 2: Interaction Trend -->
+<div class="chart-container" style="max-width: 1000px; margin: 0 auto 2.5rem;">
+    <h3 style="margin-bottom: 1.5rem; color: var(--accent-color); font-weight: 700;"><i class="ph ph-trend-up"></i> Interaction Trend Over Time</h3>
+    <canvas id="trendChart"></canvas>
+</div>
+
+<!-- Row 3: Existing charts (from original /data endpoint) -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
     <div class="chart-container">
         <h3 style="margin-bottom: 1.5rem; color: var(--primary-color); font-weight: 700;"><i class="ph ph-chart-donut"></i> Interactions by Category</h3>
@@ -21,4 +64,271 @@
     <h3 style="margin-bottom: 1.5rem; color: var(--accent-color); font-weight: 700;"><i class="ph ph-trend-up"></i> Interaction Timeline</h3>
     <canvas id="timelineChart"></canvas>
 </div>
+
+<!-- No-data overlay (shown when API fails) -->
+<div id="dashboard-empty" style="display: none; text-align: center; padding: 4rem 2rem;">
+    <i class="ph ph-chart-line-down" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem; display: block;"></i>
+    <p style="color: var(--text-muted); font-size: 1.15rem;">No data available yet. Start interacting with products to see insights here.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    Chart.defaults.color = '#cbd5e1';
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+
+    // Gradient helper
+    function createGradient(ctx, colorStart, colorEnd) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, colorStart);
+        gradient.addColorStop(1, colorEnd);
+        return gradient;
+    }
+
+    // ── Load new dashboard data (/api/analytics/dashboard) ──
+    async function loadDashboardData() {
+        try {
+            const data = await apiCall('/api/analytics/dashboard');
+
+            // KPI summaries
+            let totalViews = 0, totalCarts = 0, totalPurchases = 0;
+            (data.top_products || []).forEach(p => {
+                totalViews += p.view_count;
+                totalCarts += p.cart_count;
+                totalPurchases += p.purchase_count;
+            });
+            document.getElementById('kpi-views').textContent = totalViews.toLocaleString();
+            document.getElementById('kpi-carts').textContent = totalCarts.toLocaleString();
+            document.getElementById('kpi-purchases').textContent = totalPurchases.toLocaleString();
+
+            if (data.avg_ratings && data.avg_ratings.length > 0) {
+                const overallAvg = data.avg_ratings.reduce((s, r) => s + r.avg_rating, 0) / data.avg_ratings.length;
+                document.getElementById('kpi-avg-rating').textContent = overallAvg.toFixed(1);
+            }
+
+            // Chart 1: Top 10 Products by Interactions (stacked bar)
+            const topCtx = document.getElementById('topProductsChart');
+            if (topCtx && data.top_products && data.top_products.length > 0) {
+                const labels = data.top_products.map(p => p.name.length > 18 ? p.name.substring(0, 18) + '…' : p.name);
+                new Chart(topCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Views',
+                                data: data.top_products.map(p => p.view_count),
+                                backgroundColor: '#3b82f6',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Cart Adds',
+                                data: data.top_products.map(p => p.cart_count),
+                                backgroundColor: '#8b5cf6',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Purchases',
+                                data: data.top_products.map(p => p.purchase_count),
+                                backgroundColor: '#ec4899',
+                                borderRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Top 10 Products by Average Rating (horizontal bar)
+            const ratCtx = document.getElementById('avgRatingsChart');
+            if (ratCtx && data.avg_ratings && data.avg_ratings.length > 0) {
+                const labels = data.avg_ratings.map(r => r.name.length > 18 ? r.name.substring(0, 18) + '…' : r.name);
+                new Chart(ratCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Avg Rating',
+                            data: data.avg_ratings.map(r => r.avg_rating),
+                            backgroundColor: data.avg_ratings.map((_, i) => {
+                                const colors = ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7',
+                                                 '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7'];
+                                return colors[i % colors.length];
+                            }),
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const item = data.avg_ratings[context.dataIndex];
+                                        return `Reviews: ${item.review_count}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 5,
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { stepSize: 1 }
+                            },
+                            y: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 3: Interaction Trend (line)
+            const trendCtx = document.getElementById('trendChart');
+            if (trendCtx && data.interaction_trend && data.interaction_trend.length > 0) {
+                const ctx2d = trendCtx.getContext('2d');
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.interaction_trend.map(t => t.date),
+                        datasets: [
+                            {
+                                label: 'Views',
+                                data: data.interaction_trend.map(t => t.views),
+                                borderColor: '#3b82f6',
+                                backgroundColor: createGradient(ctx2d, 'rgba(59,130,246,0.25)', 'rgba(59,130,246,0)'),
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#3b82f6',
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            },
+                            {
+                                label: 'Purchases',
+                                data: data.interaction_trend.map(t => t.purchases),
+                                borderColor: '#ec4899',
+                                backgroundColor: createGradient(ctx2d, 'rgba(236,72,153,0.2)', 'rgba(236,72,153,0)'),
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#ec4899',
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        }
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.warn('Dashboard API failed (user may not be authenticated):', error);
+            document.getElementById('dashboard-empty').style.display = 'block';
+        }
+    }
+
+    // ── Load existing /data charts ──
+    async function loadLegacyCharts() {
+        const categoryChartCanvas = document.getElementById('categoryChart');
+        const actionChartCanvas = document.getElementById('actionChart');
+        const timelineChartCanvas = document.getElementById('timelineChart');
+
+        if (!categoryChartCanvas || !actionChartCanvas || !timelineChartCanvas) return;
+
+        try {
+            const data = await apiCall('/api/analytics/data');
+
+            new Chart(categoryChartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: data.categories.labels,
+                    datasets: [{
+                        data: data.categories.data,
+                        backgroundColor: ['#6366f1', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+            new Chart(actionChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: data.actions.labels,
+                    datasets: [{
+                        label: 'Interactions',
+                        data: data.actions.data,
+                        backgroundColor: '#ec4899',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            new Chart(timelineChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: data.timeline.labels,
+                    datasets: [{
+                        label: 'Activity Over Time',
+                        data: data.timeline.data,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        } catch (error) {
+            console.warn('Legacy analytics load failed:', error);
+        }
+    }
+
+    // Init both
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDashboardData();
+        loadLegacyCharts();
+    });
+</script>
 {% endblock %}

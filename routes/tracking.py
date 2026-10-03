@@ -22,6 +22,7 @@ def track_behavior():
         # If not logged in, we could track anonymously or just ignore. We'll ignore for now.
         return jsonify({"msg": "User not authenticated, behavior not tracked"}), 200
 
+    current_user_id = int(current_user_id)
     behavior = UserBehavior(
         user_id=current_user_id,
         product_id=product_id,
