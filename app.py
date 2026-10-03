@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager
 from config import Config
 from models import db
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -11,7 +12,7 @@ def create_app(config_class=Config):
     # Initialize extensions
     CORS(app)
     db.init_app(app)
-    jwt = JWTManager(app)
+    JWTManager(app)
 
     # Register blueprints (to be created)
     from routes.auth import auth_bp
@@ -33,6 +34,7 @@ def create_app(config_class=Config):
         db.create_all()
 
     return app
+
 
 if __name__ == '__main__':
     app = create_app()

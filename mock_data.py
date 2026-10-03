@@ -119,7 +119,7 @@ def init_mock_data():
         db.session.commit()
         # Reload with IDs
         products = {p.name: p.id for p in Product.query.all()}
-        print(f"[+] Seeded {len(products)} products across {len(set(p.category for p in Product.query.all()))} categories")
+        print(f"[+] Seeded {len(products)} products across {len(set(p.category for p in Product.query.all()))} categories")  # noqa: E501
 
         # ── 2. Users ──
         user_ids = {}
@@ -285,7 +285,7 @@ def init_mock_data():
             ("alice", "Smart Watch Series 5", 4, "Accurate fitness tracking. Battery lasts about 2 days."),
 
             # bob — values furniture quality
-            ("bob", "Ergonomic Office Chair", 5, "My back pain is gone after switching to this chair. Worth every penny."),
+            ("bob", "Ergonomic Office Chair", 5, "My back pain is gone after switching to this chair. Worth every penny."),  # noqa: E501
             ("bob", "Standing Desk",          4, "Solid build, smooth motor. Wish the surface was a bit larger."),
             ("bob", "Bookshelf Organizer",    4, "Looks great in my office. Assembly took about 30 minutes."),
             ("bob", "Stainless Steel Water Bottle", 3, "Keeps drinks cold but dents easily."),
@@ -294,10 +294,10 @@ def init_mock_data():
             ("charlie", "Men's Running Shoes",  5, "Best running shoes I've tried. Super lightweight and breathable."),
             ("charlie", "Stainless Steel Water Bottle", 4, "Perfect for the gym. Fits in any cup holder."),
             ("charlie", "Smart Watch Series 5", 3, "Heart rate monitor is decent but GPS tracking lags sometimes."),
-            ("charlie", "Women's Yoga Pants",   4, "Got these for my partner — she says they're extremely comfortable."),
+            ("charlie", "Women's Yoga Pants",   4, "Got these for my partner — she says they're extremely comfortable."),  # noqa: E501
 
             # diana — critical casual reviewer
-            ("diana", "Pour-Over Coffee Maker", 4, "Makes excellent coffee. The glass is thinner than expected though."),
+            ("diana", "Pour-Over Coffee Maker", 4, "Makes excellent coffee. The glass is thinner than expected though."),  # noqa: E501
             ("diana", "Smartphone X1",          3, "Good phone but overpriced for what you get."),
             ("diana", "Polarized Sunglasses",   2, "They look nice but the hinges feel flimsy."),
 
@@ -310,9 +310,10 @@ def init_mock_data():
             ("eve", "Men's Running Shoes",     4, "Good cushioning, true to size."),
 
             # frank — detailed kitchen reviews
-            ("frank", "Pour-Over Coffee Maker", 5, "As a coffee nerd, this is the best manual brewer under $50. The metal filter lets oils through for a richer cup."),
-            ("frank", "Chef's Knife Set",       5, "The santoku knife alone is worth the price. Holds an edge beautifully."),
-            ("frank", "Python Crash Course",    4, "Clear explanations and good projects. Chapter on Django was a bit rushed."),
+            ("frank", "Pour-Over Coffee Maker", 5,
+             "As a coffee nerd, this is the best manual brewer under $50. The metal filter lets oils through for a richer cup."),  # noqa: E501
+            ("frank", "Chef's Knife Set",       5, "The santoku knife alone is worth the price. Holds an edge beautifully."),  # noqa: E501
+            ("frank", "Python Crash Course",    4, "Clear explanations and good projects. Chapter on Django was a bit rushed."),  # noqa: E501
             ("frank", "Bookshelf Organizer",    3, "Functional but the metal frame scratches easily."),
         ]
 
@@ -336,8 +337,8 @@ def init_mock_data():
         behavior_days = db.session.query(
             func.count(func.distinct(func.date(UserBehavior.timestamp)))
         ).scalar()
-        print(f"\n✅ Mock data initialized successfully!")
-        print(f"   {len(products)} products · {len(user_ids)} users · {behavior_days} days of activity · {count} reviews")
+        print("\n✅ Mock data initialized successfully!")
+        print(f"   {len(products)} products · {len(user_ids)} users · {behavior_days} days of activity · {count} reviews")  # noqa: E501
 
 
 if __name__ == '__main__':

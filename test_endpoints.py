@@ -9,6 +9,7 @@ BASE = "http://127.0.0.1:5000"
 PASS = 0
 FAIL = 0
 
+
 def test(name, condition, detail=""):
     global PASS, FAIL
     if condition:
@@ -18,8 +19,10 @@ def test(name, condition, detail=""):
         FAIL += 1
         print(f"  ❌ {name}  →  {detail}")
 
+
 def auth_header(token):
     return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
 
 # ── Get JWT token ──
 print("\n🔑 Auth")
@@ -77,7 +80,7 @@ if "reviews" in data:
     test("Reviews list is non-empty", len(data["reviews"]) > 0, "empty list")
     if data["reviews"]:
         rev = data["reviews"][0]
-        test("Review has expected fields", all(k in rev for k in ("id", "user_id", "product_id", "rating", "review_text", "created_at")),
+        test("Review has expected fields", all(k in rev for k in ("id", "user_id", "product_id", "rating", "review_text", "created_at")),  # noqa: E501
              f"keys={list(rev.keys())}")
 
 # ── Reviews: GET /my ──
@@ -163,7 +166,7 @@ test("GET / → 200", r.status_code == 200, f"status={r.status_code}")
 
 r = requests.get(f"{BASE}/dashboard")
 test("GET /dashboard → 200", r.status_code == 200, f"status={r.status_code}")
-test("/dashboard contains Chart.js canvases", "topProductsChart" in r.text and "avgRatingsChart" in r.text and "trendChart" in r.text,
+test("/dashboard contains Chart.js canvases", "topProductsChart" in r.text and "avgRatingsChart" in r.text and "trendChart" in r.text,  # noqa: E501
      "missing chart canvases")
 
 r = requests.get(f"{BASE}/login")

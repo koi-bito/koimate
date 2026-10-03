@@ -6,8 +6,9 @@ from services.ml_pipeline import recommender
 
 recommender_bp = Blueprint('recommender', __name__)
 
+
 @recommender_bp.route('/', methods=['POST'])
-@jwt_required(optional=True) # Allow optional JWT so we can demo easily if needed
+@jwt_required(optional=True)  # Allow optional JWT so we can demo easily if needed
 def get_recommendations():
     data = request.get_json()
     if not data:
@@ -16,9 +17,9 @@ def get_recommendations():
     purchases = data.get('purchases', '')
     needs = data.get('needs', '')
     shortages = data.get('shortages', '')
-    
+
     query = f"{purchases} {needs} {shortages}"
-    
+
     if not query.strip():
         return jsonify({"msg": "Please provide purchases, needs, or shortages."}), 400
 
@@ -77,4 +78,3 @@ def get_recommendations():
         })
 
     return jsonify({"recommendations": result})
-

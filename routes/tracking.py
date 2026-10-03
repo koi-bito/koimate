@@ -4,6 +4,7 @@ from models import db, UserBehavior
 
 tracking_bp = Blueprint('tracking', __name__)
 
+
 @tracking_bp.route('/', methods=['POST'])
 @jwt_required(optional=True)
 def track_behavior():
@@ -12,8 +13,8 @@ def track_behavior():
         return jsonify({"msg": "Missing JSON in request"}), 400
 
     product_id = data.get('product_id')
-    action_type = data.get('action_type') # e.g., 'view', 'add_to_cart', 'purchase'
-    
+    action_type = data.get('action_type')  # e.g., 'view', 'add_to_cart', 'purchase'
+
     if not product_id or not action_type:
         return jsonify({"msg": "product_id and action_type are required"}), 400
 

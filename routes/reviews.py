@@ -4,6 +4,7 @@ from models import db, Review, Product
 
 reviews_bp = Blueprint('reviews', __name__)
 
+
 @reviews_bp.route('/', methods=['POST'])
 @jwt_required()
 def submit_review():
@@ -47,6 +48,7 @@ def submit_review():
         db.session.commit()
         return jsonify({"msg": "Review submitted successfully"}), 201
 
+
 @reviews_bp.route('/<int:product_id>', methods=['GET'])
 def get_product_reviews(product_id):
     reviews = Review.query.filter_by(product_id=product_id).order_by(Review.created_at.desc()).all()
@@ -63,6 +65,7 @@ def get_product_reviews(product_id):
         })
 
     return jsonify({"reviews": result})
+
 
 @reviews_bp.route('/my', methods=['GET'])
 @jwt_required()
