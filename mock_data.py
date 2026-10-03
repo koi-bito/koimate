@@ -7,6 +7,7 @@ Usage:
     python mock_data.py
 """
 from datetime import datetime, timedelta, timezone
+import random
 from app import create_app
 from models import db, Product, User, UserBehavior, Review
 
@@ -123,7 +124,8 @@ def init_mock_data():
         # ── 2. Users ──
         user_ids = {}
         for username, password in USERS:
-            u = User(username=username)
+            day_offset = random.randint(0, 9)
+            u = User(username=username, created_at=_ts(day_offset, random.randint(8, 20)))
             u.set_password(password)
             db.session.add(u)
         db.session.commit()
@@ -316,11 +318,13 @@ def init_mock_data():
 
         count = 0
         for username, product_name, rating, text in reviews:
+            day_offset = random.randint(0, 9)
             r = Review(
                 user_id=user_ids[username],
                 product_id=products[product_name],
                 rating=rating,
-                review_text=text
+                review_text=text,
+                created_at=_ts(day_offset, random.randint(8, 20))
             )
             db.session.add(r)
             count += 1
