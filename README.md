@@ -49,16 +49,20 @@ The result: recommendations that shift based on what you actually do, not just w
 koimate/
 ├── app.py              # App factory, blueprint registration
 ├── config.py           # DB URI, JWT secret, environment config
-├── models.py           # SQLAlchemy models: User, Product, UserBehavior, UserInput
+├── models.py           # SQLAlchemy models: User, Product, UserBehavior, UserInput, Review
 ├── mock_data.py        # Dev seed data
+├── seed.py             # Alternative seed script
 ├── requirements.txt
 ├── routes/
 │   ├── auth.py         # /api/auth - register & login
 │   ├── recommender.py  # /api/recommend - personalized recommendations
 │   ├── analytics.py    # /api/analytics - usage analytics
 │   ├── tracking.py     # /api/track - behavior event logging
+│   ├── reviews.py      # /api/reviews - product reviews management
 │   └── pages.py        # Frontend routes
-└── services/           # Recommendation engine and business logic
+├── services/           # Recommendation engine and business logic
+├── static/             # Static assets (CSS, JS, images)
+└── templates/          # Jinja2 HTML templates
 ```
 
 ---
@@ -72,6 +76,9 @@ koimate/
 | `GET` | `/api/recommend` | Get personalized recommendations |
 | `POST` | `/api/track` | Log a behavior event |
 | `GET` | `/api/analytics` | Retrieve interaction analytics |
+| `POST` | `/api/reviews` | Submit or update a product review |
+| `GET` | `/api/reviews/<product_id>` | Get reviews for a specific product |
+| `GET` | `/api/reviews/my` | Get current user's reviews |
 
 All protected routes require `Authorization: Bearer <token>`.
 
