@@ -10,3 +10,4 @@ python-dotenv
 cryptography
 pytest
 pytest-flask
+gunicorn
