@@ -33,15 +33,6 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
-    @app.route('/api/ping')
-    def ping():
-        from sqlalchemy import text
-        try:
-            db.session.execute(text('SELECT 1'))
-            return {"status": "ok", "message": "Pong! Database is awake."}, 200
-        except Exception as e:
-            return {"status": "error", "message": str(e)}, 500
-
     return app
 
 
